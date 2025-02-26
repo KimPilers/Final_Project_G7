@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./Login.css";
 
-function Login({ setUser }) {
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -10,28 +11,58 @@ function Login({ setUser }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
-
+  
+    console.log("🔍 กำลังส่งไป Backend:", email, password); // ✅ Debug ตรงนี้
+  
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/login", { email, password });
-      setUser(response.data.user);
-      navigate("/products");
+      const response = await axios.post("http://localhost:5000/login", {
+        email,
+        password,
+      });
+  
+      console.log("✅ Login response:", response.data);
+      
+      alert("Login successful");
+      navigate(`/order/${response.data.customer_id}`);
+  
     } catch (err) {
-      setError(err.response?.data?.error || "Login failed");
+      console.error("❌ Error:", err.response?.data?.error || err.message);
+      setError(err.response?.data?.error || "เกิดข้อผิดพลาด");
     }
   };
+  
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Login</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleLogin}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <br />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <br />
-        <button type="submit">Login</button>
-      </form>
+    <div className="login-container">
+      <div className="login-box">
+        <h2>เข้าสู่ระบบ</h2>
+        {error && <p className="error-msg">{error}</p>} {/* แสดง Error */}
+        <form onSubmit={handleLogin}>
+          <div className="input-group">
+            <label htmlFor="email">อีเมล</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="กรอกอีเมล"
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="password">รหัสผ่าน</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="กรอกรหัสผ่าน"
+            />
+          </div>
+          <button type="submit" className="login-btn">เข้าสู่ระบบ</button>
+        </form>
+      </div>
     </div>
   );
 }

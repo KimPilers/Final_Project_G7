@@ -1,30 +1,34 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import Products from "./pages/Products";
 import Cart from "./pages/Cart";
-import Order from "./pages/Order";
-import Payment from "./pages/Payment";
-import OrderTracking from "./pages/OrderTracking";
+import Login from "./pages/Login";
+import Order from "./pages/Order"; // ✅ นำเข้า Order Page
+import Navbar from "./components/Navbar";
 
 function App() {
-  const [cart, setCart] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
 
   const addToCart = (product) => {
-    setCart([...cart, product]);
+    setCartItems((prevItems) => [...prevItems, { ...product, quantity: 1 }]);
+  };
+
+  const removeFromCart = (productID) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item.ProductID !== productID));
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
   };
 
   return (
     <Router>
-      <Navbar cartCount={cart.length} />
+      <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products addToCart={addToCart} />} />
-        <Route path="/cart" element={<Cart cart={cart} />} />
-        <Route path="/order" element={<Order cart={cart} />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/tracking" element={<OrderTracking />} />
+        <Route path="/" element={<Home addToCart={addToCart} />} />
+        <Route path="/cart" element={<Cart cartItems={cartItems} removeFromCart={removeFromCart} clearCart={clearCart} />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/order/:customerId" element={<Order />} /> {/* ✅ เพิ่ม Route สำหรับ Order */}
       </Routes>
     </Router>
   );
